@@ -1,18 +1,17 @@
-/* *****************************************************************************
- *              ALL STUDENTS COMPLETE THESE SECTIONS
- * Title:            (program's title)
- * Files:            (list of source files)
- * Semester:         Spring 2021
- * 
- * Author:           (your name and email address)
- * 
- * Description:		 (a short description of the program)
- * 
- * Written:       	 (date)
- * 
- * Credits:          (list anyone or any resource that helped you write your program)
- **************************************************************************** */
-
+ /*
+ #############################################################################
+ ###                                                                       ###
+ ### Title:         Sudoku Solver                                          ###
+ ###                                                                       ###
+ ### Files:         BasicSudoku.java|GUISudoku.java                        ###
+ ### Author(s):     Michael Metz (mime9599@colorado.edu)                   ###
+ ### Class:         ATLAS 2519                                             ###
+ ### Written:       February 12, 2021                                      ###
+ ### Description:                                                          ###
+ ### License:                                                              ###
+ ### Credits:                                                              ###
+ #############################################################################
+*/
 
 /**
  * (Write a succinct description of this class here. You should avoid wordiness
