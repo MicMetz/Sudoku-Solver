@@ -1,4 +1,6 @@
- /*
+import javafx.scene.control.CheckBox;
+
+/*
  #############################################################################
  ###                                                                       ###
  ### Title:         Sudoku Solver                                          ###
@@ -157,13 +159,47 @@ public class BasicSudoku {
 		 * @return True if the board is valid (i.e., does not contain any
 		 * 		   duplicates in any rows, columns, or sub 3x3 boxes
 		 */
-		public static boolean checkBoard(int[][] board) 
-		{
-			//TODO: Your code here
-			return false;
+		public static boolean checkBoard(int[][] board) {
+			if (checkRow(board) == false) { return false; }
+			// else if (CheckBox() == false) { return false; }
+			return true;
 		}
-		
+		/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkRow)------------------------------------------------------------------------------------------------ */
+		private static boolean checkRow(int[][] board) {
 
+			for (int[] iter : board) {
+				for (int indx = 0; indx < 9; indx++) {
+					for (int inner_indx = 0; inner_indx < 9; inner_indx++) {
+						if (iter[indx] == iter[inner_indx] && indx != inner_indx) { return false; }
+					}
+					if (checkColumn(board, iter[indx], indx) == false) { return false; }
+				}
+			}
+
+			return true;
+		}
+		/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkColumn)------------------------------------------------------------------------------------------------ */
+		private static boolean checkColumn(int[][] board, int value, int column) {
+
+			for (int[] iter : board) {
+				if (iter == board[column]) { continue; }
+				if (iter[column] == value) { return false; }
+			}
+
+			return true;
+		}
+		/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBox)------------------------------------------------------------------------------------------------ */
+/* 		private static boolean checkBox(int[][] board, int value, int column) {
+			boolean chcValue = true;
+
+			for (int[] iter : board) {
+				if (iter == board[column]) { continue; }
+				if (iter[column] == value) { return false; }
+			}
+
+			return true;
+		}
+ */
 		/**
 		 * Attempts to recursively solve a sudoku board using a backtracking approach.
 		 * The algorithm works as follows:
