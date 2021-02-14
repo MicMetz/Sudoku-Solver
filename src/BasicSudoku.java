@@ -77,35 +77,58 @@ public class BasicSudoku {
 		// testing if other components of your checkBoard method
 		// works for duplicates in columns and boxes).
 
-		// board1 is not valid (notice the duplicate 9's in the
-		// first row)
-		/* int[][] board1 = { { 9, 2, 3, 4, 5, 6, 7, 8, 9 }, 
-						   { 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
-						   { 7, 8, 9, 1, 2, 3, 0, 5, 0 },
-						   { 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
-						   { 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
-						   { 8, 9, 7, 2, 1, 4, 0, 6, 5 },
-						   { 5, 3, 1, 6, 4, 2, 9, 7, 8 }, 
-						   { 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
-						   { 9, 7, 8, 5, 3, 1, 6, 4, 0 } }; */
 
+		// board1 valid
+		// int[][] board1 = { 
+		// 	{ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 
+		// 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
+		// 	{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
+		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
+		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
+		// 	{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
+		// 	{ 5, 3, 1, 6, 4, 2, 9, 7, 8 }, 
+		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
+		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
+
+
+		// board1 is not valid (notice the duplicate 9's in the first row)
+		// int[][] board1 = { 
+		// 	{ 9, 2, 3, 4, 5, 6, 7, 8, 9 }, 
+		// 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
+		// 	{ 7, 8, 9, 1, 2, 3, 0, 5, 0 },
+		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
+		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
+		// 	{ 8, 9, 7, 2, 1, 4, 0, 6, 5 },
+		// 	{ 5, 3, 1, 6, 4, 2, 9, 7, 8 }, 
+		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
+		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 0 } };
+
+
+		// board1 error (box 2)
 		int[][] board1 = { 
 			{ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 
-			{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
+			{ 0, 5, 6, 7, 4, 9, 1, 2, 3 }, 
 			{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
 			{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
 			{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
 			{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
-			{ 5, 3, 1, 6, 4, 2, 9, 7, 8 }, 
+			{ 5, 3, 1, 6, 0, 2, 9, 7, 8 }, 
 			{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
 			{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
 
-		// board2 is valid and corresponds to the board in the
-		// easy.txt file. This one should take your computer less
-		// than a second to solve.
-		int[][] board2 = { { 0, 2, 3, 4, 5, 6, 7, 8, 9 }, { 4, 5, 6, 7, 8, 9, 1, 2, 3 }, { 7, 8, 9, 1, 2, 3, 0, 5, 0 },
-				{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, { 3, 6, 5, 8, 9, 7, 2, 1, 4 }, { 8, 9, 7, 2, 1, 4, 0, 6, 5 },
-				{ 5, 3, 1, 6, 4, 2, 9, 7, 8 }, { 6, 4, 2, 9, 7, 8, 5, 3, 1 }, { 9, 7, 8, 5, 3, 1, 6, 4, 0 } };
+
+		// board2 is valid and corresponds to the board in the easy.txt file. This one should take your computer less than a second to solve.
+		// int[][] board2 = { 
+		// 	{ 0, 2, 3, 4, 5, 6, 7, 8, 9 }, 
+		// 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
+		// 	{ 7, 8, 9, 1, 2, 3, 0, 5, 0 },
+		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
+		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
+		// 	{ 8, 9, 7, 2, 1, 4, 0, 6, 5 },
+		// 	{ 5, 3, 1, 6, 4, 2, 9, 7, 8 },
+		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
+		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 0 } };
+
 
 		printBoard(board1);
 		if (checkBoard(board1)) {
@@ -162,16 +185,20 @@ public class BasicSudoku {
 	 * are no duplicate values in: -Any row -Any column -Any of the 3x3 subgrids
 	 * (boxes) This method should return true if the board is valid (no duplicates)
 	 * and false otherwise. To solve this, create and implement 4 helper methods:
-	 * -checkRow - checks a single row for duplicates -checkColumn - checks a single
-	 * column for duplicates -checkBoxes - divides the grid into 9 3x3 boxes and
-	 * calls checkBox for each box -checkBox - checks a single 3x3 box for
-	 * duplicates
 	 * 
-	 * Using these methods, your pseudocode for checkBoard is as follows: for (each
-	 * row in board): if (row contains duplicate): return false endfor for (each
-	 * column in board): if (column contains duplicate) return false if
-	 * (checkBoxes(board) indicates a box contains a duplicate): return false return
-	 * true;
+	 * -checkRow - checks a single row for duplicates 
+	 * 
+	 * -checkColumn - checks a single column for duplicates -checkBoxes - divides the grid into 9 3x3 boxes and
+	 * 		calls checkBox for each box -checkBox - checks a single 3x3 box for duplicates
+	 * 
+	 * Using these methods, your pseudocode for checkBoard is as follows: 
+	 * 	for (each row in board): 
+	 * 		if (row contains duplicate): return false endfor for (each column in board): 
+	 * 
+	 * 		if (column contains duplicate) return false 
+	 * 
+	 *		if (checkBoxes(board) indicates a box contains a duplicate): return false 
+	 * 	return true;
 	 * 
 	 * @param board A 2D array of ints corresponding to a sudoku board where 0's
 	 *              indicate an empty cell
@@ -185,66 +212,89 @@ public class BasicSudoku {
 		// else if (CheckBox() == false) { return false; }
 		return true;
 	}
-
-	/*
-	 * -----------------------------------------------------------------------------
-	 * --------------IMPLEMENTATION
-	 * (checkRow)-------------------------------------------------------------------
-	 * -----------------------------
-	 */
+	/* -------------------------------------------------------------------------------------------IMPLEMENTATION(checkRow)------------------------------------------------------------------------------------------------*/
 	private static boolean checkRow(int[][] board) {
-			ErrorPair nuError = new ErrorPair();
-			int 	  level	  = 	0;
+		ErrorPair nuError = new ErrorPair();
+		int 	  row	  = 	0;
 
-			for (int[] iter : board) {
-				for (int indx = 0; indx < 9; indx++) {
-					// if (iter[indx] == 0) { continue; }
-					for (int inner_indx = 0; inner_indx < 9; inner_indx++) {
-						// if (iter[inner_indx] == 0) { continue; }
-						if (iter[indx] == iter[inner_indx] && (indx != inner_indx)) { 
-							nuError.makePair(level, indx);
-							errors.add(nuError);
-							return false;
-						}
-					}
-					if (checkColumn(board, iter[indx], indx, level) == false) { 
-						nuError.makePair(level, indx);
+		for (int[] iter : board) {
+			for (int indx = 0; indx < 9; indx++) {
+				// if (iter[indx] == 0) { continue; }
+				for (int inner_indx = 0; inner_indx < 9; inner_indx++) {
+					// if (iter[inner_indx] == 0) { continue; }
+					if (iter[indx] == iter[inner_indx] && (indx != inner_indx)) { 
+						nuError.makePair(row, indx);
 						errors.add(nuError);
 						return false;
 					}
 				}
-				level++;
-			}
-
-			return true;
-		}
-		/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkColumn)------------------------------------------------------------------------------------------------ */
-		private static boolean checkColumn(int[][] board, int value, int column, int row) {
-			boolean test1 = false;
-			for (int[] iter : board) {
-				if (iter == board[row]) { continue; }
-				else {
-					if (iter[column] == value) { 
-						test1 = true;
-						return false;
-					}
+				if (checkColumn(board, iter[indx], indx, row) == false) { 
+					nuError.makePair(row, indx);
+					errors.add(nuError);
+					return false;
+				}
+				if (checkBox(board, iter[indx], indx, row) == false) { 
+					nuError.makePair(row, indx);
+					errors.add(nuError);
+					return false;
 				}
 			}
-
-			return true;
+			row++;
 		}
-		/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBox)------------------------------------------------------------------------------------------------ */
-/* 		private static boolean checkBox(int[][] board, int value, int column) {
-			boolean chcValue = true;
 
-			for (int[] iter : board) {
-				if (iter == board[column]) { continue; }
-				if (iter[column] == value) { return false; }
+		return true;
+	}
+	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkColumn)------------------------------------------------------------------------------------------------ */
+	private static boolean checkColumn(int[][] board, int value, int column, int row) {
+		ErrorPair nuError = new ErrorPair();
+		// boolean test1 = false;
+		for (int[] iter : board) {
+			if (iter == board[row]) { continue; }
+			else {
+				if (iter[column] == value) { 
+					nuError.makePair(row, column);
+					errors.add(nuError);
+					// test1 = true;
+					return false;
+				}
 			}
-
-			return true;
 		}
- */
+
+		return true;
+	}
+	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBox)------------------------------------------------------------------------------------------------ */
+	private static boolean checkBox(int[][] board, int value, int column, int row) {
+		ErrorPair nuError = new ErrorPair();
+		int 	  x, y;
+
+		if (row < 3) {
+			y = 0;
+		}
+		else if (row < 6) {
+			y = 3;
+		}
+		else { y = 6; }
+		/* ---------- */
+		if (column < 3) {
+			x = 0;
+		}
+		else if (column < 6) {
+			x = 3;
+		}
+		else { x = 6; }
+
+		for (int rIter = y; rIter < y + 3; rIter++) {
+			for (int cIter = x; cIter < x + 3; cIter++) {
+				if ((rIter == row) && (cIter == column)) { continue; }
+				else { 
+					if (board[rIter][cIter] == value) { return false; }
+				}
+			}
+		}
+
+		return true;
+	}
+
 		/**
 		 * Attempts to recursively solve a sudoku board using a backtracking approach.
 		 * The algorithm works as follows:
