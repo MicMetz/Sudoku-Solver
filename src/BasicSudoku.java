@@ -114,12 +114,12 @@ public class BasicSudoku {
 			System.out.println("The board is not valid!");
 		}
 
-		if (solve(board1)) {
+		/* if (solve(board1)) {
 			System.out.println("Solved! Solution:");
 			printBoard(board1);
 		} else {
 			System.out.println("Couldn't solve the board!");
-		}
+		} */
 
 	}
 
@@ -207,7 +207,7 @@ public class BasicSudoku {
 							return false;
 						}
 					}
-					if (checkColumn(board, iter[indx], indx) == false) { 
+					if (checkColumn(board, iter[indx], indx, level) == false) { 
 						nuError.makePair(level, indx);
 						errors.add(nuError);
 						return false;
@@ -219,11 +219,16 @@ public class BasicSudoku {
 			return true;
 		}
 		/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkColumn)------------------------------------------------------------------------------------------------ */
-		private static boolean checkColumn(int[][] board, int value, int column) {
-
+		private static boolean checkColumn(int[][] board, int value, int column, int row) {
+			boolean test1 = false;
 			for (int[] iter : board) {
-				if (iter == board[column]) { continue; }
-				if (iter[column] == value) { return false; }
+				if (iter == board[row]) { continue; }
+				else {
+					if (iter[column] == value) { 
+						test1 = true;
+						return false;
+					}
+				}
 			}
 
 			return true;
@@ -310,9 +315,9 @@ public class BasicSudoku {
 			boolean chcBoard = checkBoard(board);
 			
 
-			if (!chcBoard) { 
+			// if (!chcBoard) { 
 				
-			}
+			// }
 
 			return false;
 		}
