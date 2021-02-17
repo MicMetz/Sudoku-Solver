@@ -14,6 +14,7 @@
 */
 
 /* INCLUDES */
+import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -30,35 +31,49 @@ import java.util.*;
  * @author (your name)
  */
 public class BasicSudoku {
-		static ArrayList<ErrorPair> errors = new ArrayList<ErrorPair>();
+		static ArrayList<ErrorID> errors = new ArrayList<ErrorID>();
 
 
 	/* 
 	
 	*/
-	static class ErrorPair {
-		private int column = 0;
-		private int row = 0;
+	static class ErrorID {
+		private boolean sqUnit	= false;
+		private long 	subBox 	= -0;
+		private int 	column 	= 0;
+		private int 	row 	= 0;
+		
 
-		ErrorPair() {}
+		ErrorID() {}
 
-		ErrorPair(int row, int column) {
+		ErrorID(int row, int column) {
 			this.column = column;
 			this.row = row;
+		}
+		ErrorID(long subBox) {
+			this.subBox = subBox;
+			sqUnit = true;
 		}
 
 		public void makePair(int row, int column) {
 			this.column = column;
 			this.row = row;
 		}
-
-		public int getX() {
-			return column;
+		public void makeTuple(int row, int column, long subBox) {
+			this.column = column;
+			this.row 	= row;
+			this.subBox	= subBox;
+			sqUnit = true;
 		}
 
-		public int getY() {
-			return row;
-		}
+		public int 		getX() 		{ return column; }
+
+		public int 		getY() 		{ return row; }
+
+		public long 	getBox() 	{ return subBox; }
+
+		public boolean	isBox()		{ return sqUnit; }
+
 	};
 
 	/**
@@ -79,16 +94,16 @@ public class BasicSudoku {
 
 
 		// board1 valid
-		// int[][] board1 = { 
-		// 	{ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 
-		// 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
-		// 	{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
-		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
-		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
-		// 	{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
-		// 	{ 5, 3, 1, 6, 4, 2, 9, 7, 8 }, 
-		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
-		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
+		int[][] board1 = { 
+			{ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 
+			{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
+			{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
+			{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
+			{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
+			{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
+			{ 5, 3, 1, 6, 4, 2, 9, 7, 8 }, 
+			{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
+			{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
 
 
 		// board1 is not valid (notice the duplicate 9's in the first row)
@@ -105,16 +120,16 @@ public class BasicSudoku {
 
 
 		// board1 error (box 2)
-		int[][] board1 = { 
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 
-			{ 0, 5, 6, 7, 4, 9, 1, 2, 3 }, 
-			{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
-			{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
-			{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
-			{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
-			{ 5, 3, 1, 6, 0, 2, 9, 7, 8 }, 
-			{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
-			{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
+		// int[][] board1 = { 
+		// 	{ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 
+		// 	{ 0, 5, 6, 7, 4, 9, 1, 2, 3 }, 
+		// 	{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
+		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
+		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
+		// 	{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
+		// 	{ 5, 3, 1, 6, 0, 2, 9, 7, 8 }, 
+		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
+		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
 
 
 		// board2 is valid and corresponds to the board in the easy.txt file. This one should take your computer less than a second to solve.
@@ -206,90 +221,85 @@ public class BasicSudoku {
 	 *         any rows, columns, or sub 3x3 boxes
 	 */
 	public static boolean checkBoard(int[][] board) {
-		if (checkRow(board) == false) {
-			return false;
+		for (int[] iter : board) { 
+			if (checkBoxes(board) == false) { return false; }
+			/* if (checkRow(board, row) == false) {
+				return false;
+			}
+			row++; */
 		}
-		// else if (CheckBox() == false) { return false; }
+		// else if (checkBoxes(board) == false) { return false; }
 		return true;
 	}
 	/* -------------------------------------------------------------------------------------------IMPLEMENTATION(checkRow)------------------------------------------------------------------------------------------------*/
-	private static boolean checkRow(int[][] board) {
-		ErrorPair nuError = new ErrorPair();
-		int 	  row	  = 	0;
+	private static boolean checkRow(int[][] board, int row) {
+		ErrorID nuError = new ErrorID();
 
-		for (int[] iter : board) {
-			for (int indx = 0; indx < 9; indx++) {
-				// if (iter[indx] == 0) { continue; }
-				for (int inner_indx = 0; inner_indx < 9; inner_indx++) {
-					// if (iter[inner_indx] == 0) { continue; }
-					if (iter[indx] == iter[inner_indx] && (indx != inner_indx)) { 
-						nuError.makePair(row, indx);
-						errors.add(nuError);
-						return false;
-					}
-				}
-				if (checkColumn(board, iter[indx], indx, row) == false) { 
-					nuError.makePair(row, indx);
+		for (int indx_start = 0; indx_start < 9; indx_start++) {
+			// // Or Math.floor()
+			// long subLoc = (indx_start/3);
+			for (int inner_indx = 0; inner_indx < 9; inner_indx++) { 
+				if (indx_start == inner_indx) { continue; }
+				if (board[row][indx_start] == board[row][inner_indx]) 	{ 
+					nuError.makePair(row, indx_start);
 					errors.add(nuError);
-					return false;
-				}
-				if (checkBox(board, iter[indx], indx, row) == false) { 
-					nuError.makePair(row, indx);
-					errors.add(nuError);
-					return false;
+					return false; 
 				}
 			}
-			row++;
+			if 	(checkColumn(board, board[row][indx_start], indx_start, row) == false) 	{
+				nuError.makePair(row, indx_start);
+				errors.add(nuError);
+				return false; 
+			}
+			// else if (checkBox(board, board[row][indx_start], indx_start, row) == false) {
+			// 	nuError.makePair(row, indx_start);
+			// 	errors.add(nuError);
+			// 	return false; 
+			// }
 		}
-
+			
 		return true;
 	}
 	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkColumn)------------------------------------------------------------------------------------------------ */
 	private static boolean checkColumn(int[][] board, int value, int column, int row) {
-		ErrorPair nuError = new ErrorPair();
-		// boolean test1 = false;
-		for (int[] iter : board) {
-			if (iter == board[row]) { continue; }
-			else {
-				if (iter[column] == value) { 
-					nuError.makePair(row, column);
-					errors.add(nuError);
-					// test1 = true;
-					return false;
-				}
+		ErrorID 	nuError 	= new ErrorID();
+
+		for (int indx_start = 0; indx_start < 9; indx_start++) {
+			if (indx_start == row) { continue; }
+			if (value == board[indx_start][column]) {
+				nuError.makePair(row, indx_start);
+				errors.add(nuError);
+				return false; 
 			}
 		}
 
 		return true;
 	}
 	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBox)------------------------------------------------------------------------------------------------ */
-	private static boolean checkBox(int[][] board, int value, int column, int row) {
-		ErrorPair nuError = new ErrorPair();
-		int 	  x, y;
+	private static boolean checkBoxes(int[][] board/* , int value, int column, int row */) {
+		ErrorID 		nuError 	= new ErrorID();
+		Set<Integer> 	tileCheck   = new HashSet<>();
+		int 			starter1 	= 0;
+		int				starter2	= 0;
+		
 
-		if (row < 3) {
-			y = 0;
-		}
-		else if (row < 6) {
-			y = 3;
-		}
-		else { y = 6; }
-		/* ---------- */
-		if (column < 3) {
-			x = 0;
-		}
-		else if (column < 6) {
-			x = 3;
-		}
-		else { x = 6; }
-
-		for (int rIter = y; rIter < y + 3; rIter++) {
-			for (int cIter = x; cIter < x + 3; cIter++) {
-				if ((rIter == row) && (cIter == column)) { continue; }
-				else { 
-					if (board[rIter][cIter] == value) { return false; }
+		for (int bIter = 0; bIter < 9; bIter++) {
+			if (starter2 == 9) { 
+				starter1 += 3; 
+				starter2 = 0;
+			}
+			for (int rIter = starter1; rIter < starter1 + 3; rIter++) {
+				for (int cIter = starter2; cIter != starter2 + 3; cIter++) {
+					if (tileCheck.add(board[rIter][cIter]) == false) {
+						long subLoc = (cIter/3);
+						nuError.makeTuple(rIter, cIter, subLoc);
+						errors.add(nuError);
+						return false; 
+					}
 				}
 			}
+			tileCheck.clear();
+			starter2 += 3;
 		}
 
 		return true;
