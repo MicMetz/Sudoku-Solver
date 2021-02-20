@@ -176,6 +176,7 @@ public class BasicSudoku {
 		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
 
 
+
 		// board1 is not valid (notice the duplicate 9's in the first row)
 		// int[][] board1 = { 
 		// 	{ 9, 2, 3, 4, 5, 6, 7, 8, 9 }, 
@@ -220,7 +221,7 @@ public class BasicSudoku {
 		if (checkBoard(board1)) {
 			System.out.print("The board is valid");
 			if (unsolved) { System.out.println("....but not solved.");}
-			if (!unsolved) { System.out.println(" and completely solved.");}
+			if (!unsolved) { System.out.println(" and solved.");}
 		} 
 		else {
 			System.out.println("The board is not valid!");
