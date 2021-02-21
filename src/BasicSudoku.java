@@ -14,7 +14,6 @@
 */
 
 /* INCLUDES */
-import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -31,135 +30,151 @@ import java.util.*;
  * @author (your name)
  */
 public class BasicSudoku {
-		static ArrayList<ErrorID> errors = new ArrayList<ErrorID>();
+		static ArrayList<ErrorID> ERRORS = new ArrayList<ErrorID>();
+		static boolean	unsolved		 = false;						// Help define a difference between a valid, and a solved, board state.
 
 
-	/* 
-	
-	*/
-	static class ErrorID {
-		private boolean sqUnit	= false;
-		private long 	subBox 	= -0;
-		private int 	column 	= 0;
-		private int 	row 	= 0;
+
+	/* ------------------------------------------------------------------------------------------- Start Of ErrorID OBJ ------------------------------------------------------------------------------------------------ */
+	public static class ErrorID {
+		private int[][]	BoardID;
+		private boolean emptyUnit	= false;
+		private int 	column 		= 0;
+		private int 	row 		= 0;
 		
 
 		ErrorID() {}
 
-		ErrorID(int row, int column) {
-			this.column = column;
-			this.row = row;
-		}
-		ErrorID(long subBox) {
-			this.subBox = subBox;
-			sqUnit = true;
-		}
-
-		public void makePair(int row, int column) {
-			this.column = column;
-			this.row = row;
-		}
-		public void makeTuple(int row, int column, long subBox) {
+		ErrorID(int row, int column, int[][] board) {
 			this.column = column;
 			this.row 	= row;
-			this.subBox	= subBox;
-			sqUnit = true;
+			BoardID 	= board;
+		}
+		ErrorID(int row, int column, int[][] board, boolean unit) {
+			this.column = column;
+			this.row 	= row;
+			BoardID 	= board;
+			emptyUnit 	= unit;
 		}
 
-		public int 		getX() 		{ return column; }
 
-		public int 		getY() 		{ return row; }
+		public void makePair(int row, int column, int[][] board) {
+			this.column = column;
+			this.row 	= row;
+			BoardID 	= board;
+		}
+		// public void makeTuple(int row, int column, long subBox, int[][] board) {
+		// 	this.column = column;
+		// 	this.row 	= row;
+		// 	this.subBox	= subBox;
+		// 	sqUnit = true;
+		// 	BoardID = board;
+		// }
 
-		public long 	getBox() 	{ return subBox; }
+		//@Override 
+		/* public boolean equals(ErrorID obj2) {
+			if (this.row == obj2.getY() && this.column == obj2.getX() && this.BoardID == obj2.getID()) { return true; }
+			return false;
+		} */
 
-		public boolean	isBox()		{ return sqUnit; }
+		//	GETTERS | SETTERS | CHECKERS
+		public int 		getX() 							{ return column; }
+
+		public int 		getY() 							{ return row; }
+
+		public Object	getID()							{ return BoardID; }
+
+		public void 	setType(boolean designation) 	{ emptyUnit = designation; }
+
+		public boolean	isEmptyUnit()					{ return emptyUnit; }
+
 
 	};
 
-	/**
-	 * Main entry point of the program. Prints out a hardcoded sudoku board, then
-	 * tries to check if the board is valid (i.e., no duplicates in any rows,
-	 * columns, or boxes) then tries to solve the board.
-	 *
-	 * @param args No command-line arguments expected
-	 */
-	public static void main(String[] args) {
-
-		// Here we've hardcoded 2 simple Sudoku boards
-		// for you to use in implementing and testing your methods
-		// Feel free to change the values in these boards (or
-		// create your own boards) to help in testing (e.g., for
-		// testing if other components of your checkBoard method
-		// works for duplicates in columns and boxes).
+	/* ------------------------------------------------------------------------------------------- End Of ErrorID OBJ ------------------------------------------------------------------------------------------------ */
 
 
-		// board1 valid
-		int[][] board1 = { 
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 
-			{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
-			{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
-			{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
-			{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
-			{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
-			{ 5, 3, 1, 6, 4, 2, 9, 7, 8 }, 
-			{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
-			{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
 
+	/* ------------------------------------------------------------------------------------------- Start Of HELPERS ------------------------------------------------------------------------------------------------ */
 
-		// board1 is not valid (notice the duplicate 9's in the first row)
-		// int[][] board1 = { 
-		// 	{ 9, 2, 3, 4, 5, 6, 7, 8, 9 }, 
-		// 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
-		// 	{ 7, 8, 9, 1, 2, 3, 0, 5, 0 },
-		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
-		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
-		// 	{ 8, 9, 7, 2, 1, 4, 0, 6, 5 },
-		// 	{ 5, 3, 1, 6, 4, 2, 9, 7, 8 }, 
-		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
-		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 0 } };
+	/* -------------------------------------------------------------------------------------------HELPER (FindTile_Empty)------------------------------------------------------------------------------------------------ */
+	private static BasicSudoku.ErrorID FindTile_Empty(int[][] board) {
 
-
-		// board1 error (box 2)
-		// int[][] board1 = { 
-		// 	{ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 
-		// 	{ 0, 5, 6, 7, 4, 9, 1, 2, 3 }, 
-		// 	{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
-		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
-		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
-		// 	{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
-		// 	{ 5, 3, 1, 6, 0, 2, 9, 7, 8 }, 
-		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
-		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
-
-
-		// board2 is valid and corresponds to the board in the easy.txt file. This one should take your computer less than a second to solve.
-		// int[][] board2 = { 
-		// 	{ 0, 2, 3, 4, 5, 6, 7, 8, 9 }, 
-		// 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
-		// 	{ 7, 8, 9, 1, 2, 3, 0, 5, 0 },
-		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
-		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
-		// 	{ 8, 9, 7, 2, 1, 4, 0, 6, 5 },
-		// 	{ 5, 3, 1, 6, 4, 2, 9, 7, 8 },
-		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
-		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 0 } };
-
-
-		printBoard(board1);
-		if (checkBoard(board1)) {
-			System.out.println("The board is valid");
-		} else {
-			System.out.println("The board is not valid!");
+		for (ErrorID err : ERRORS) {
+			if (err.isEmptyUnit()) {
+				return err; 
+			}
 		}
 
-		/* if (solve(board1)) {
-			System.out.println("Solved! Solution:");
-			printBoard(board1);
-		} else {
-			System.out.println("Couldn't solve the board!");
-		} */
-
+		return null;
 	}
+
+
+	/* -------------------------------------------------------------------------------------------HELPER (FindTile_Error)------------------------------------------------------------------------------------------------ */
+	private static BasicSudoku.ErrorID FindTile_Error(int[][] board, ErrorID ID) {
+		if (checkNoErrors(board) == true) { return null; }  
+		else {
+			for (ErrorID err : ERRORS) {
+				if (ID.equals(err)) {
+					return ID;
+				}
+			}
+		}
+		
+		return null;
+	}
+
+
+
+	private static BasicSudoku.ErrorID getTile_Error(int[][] board) {
+		if (checkNoErrors(board) == true) { return null; }  
+		else {
+			for (ErrorID err : ERRORS) {
+				return err;
+			}
+		}
+
+		return null;
+	}
+
+	/* -------------------------------------------------------------------------------------------HELPER (checkNoErrors)------------------------------------------------------------------------------------------------ */
+	/**
+	 * Checks to see if the current board is valid.
+	 * Then prints a notification reporting if any/how many ERRORS were encountered.
+	 * 
+	*/
+	private static boolean checkNoErrors(int[][] board) {
+		boolean emptyOfErr = true;
+		unsolved 		   = false;
+
+		for (ErrorID iter : ERRORS) {
+			if (iter.getID() == board) {
+				if (iter.isEmptyUnit()) { 
+					unsolved = true;
+					continue; 
+				}
+				else {
+					emptyOfErr = false;
+					break;
+				}
+			}
+		}
+
+		return emptyOfErr;
+	}
+
+
+
+	/* -------------------------------------------------------------------------------------------HELPER (checkFull)------------------------------------------------------------------------------------------------ */
+	private static boolean checkFull(int[][] board) {
+		for (int[] level : board) {
+			for (int tile : level) { 
+				if (tile == 0) { return false; }
+			}
+		}
+		return true;
+	}
+
 
 	/**
 	 * Prints out a sudoku board to the console.
@@ -195,6 +210,250 @@ public class BasicSudoku {
 		}
 	}
 
+	/* ------------------------------------------------------------------------------------------- END OF HELPERS ------------------------------------------------------------------------------------------------ */
+
+
+
+	/**
+	 * Main entry point of the program. Prints out a hardcoded sudoku board, then
+	 * tries to check if the board is valid (i.e., no duplicates in any rows,
+	 * columns, or boxes) then tries to solve the board.
+	 *
+	 * @param args No command-line arguments expected
+	 */
+	public static void main(String[] args) {
+
+		// Here we've hardcoded 2 simple Sudoku boards
+		// for you to use in implementing and testing your methods
+		// Feel free to change the values in these boards (or
+		// create your own boards) to help in testing (e.g., for
+		// testing if other components of your checkBoard method
+		// works for duplicates in columns and boxes).
+
+
+		// board1 valid
+		// int[][] board1 = { 
+		// 	{ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 
+		// 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
+		// 	{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
+		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
+		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
+		// 	{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
+		// 	{ 5, 3, 1, 6, 4, 2, 9, 7, 8 }, 
+		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
+		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
+
+		// board1 to solve 
+		// int[][] board1 = { 
+		// 	{ 0, 2, 3, 4, 5, 6, 7, 8, 0 }, 
+		// 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
+		// 	{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
+		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
+		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
+		// 	{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
+		// 	{ 5, 3, 1, 6, 4, 2, 9, 7, 8 }, 
+		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
+		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
+
+
+
+		// board1 is not valid (notice the duplicate 9's in the first row)
+		int[][] board1 = { 
+			{ 9, 2, 3, 4, 5, 6, 7, 8, 9 }, 
+			{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
+			{ 7, 8, 9, 1, 2, 3, 0, 5, 0 },
+			{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
+			{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
+			{ 8, 9, 7, 2, 1, 4, 0, 6, 5 },
+			{ 5, 3, 1, 6, 4, 2, 9, 7, 8 }, 
+			{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
+			{ 9, 7, 8, 5, 3, 1, 6, 4, 0 } };
+
+
+		// board1 error (box 2)
+		// int[][] board1 = { 
+		// 	{ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 
+		// 	{ 0, 5, 6, 7, 4, 9, 1, 2, 3 }, 
+		// 	{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
+		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
+		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
+		// 	{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
+		// 	{ 5, 3, 1, 6, 0, 2, 9, 7, 8 }, 
+		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
+		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
+
+
+		// board2 is valid and corresponds to the board in the easy.txt file. This one should take your computer less than a second to solve.
+		// int[][] board2 = { 
+		// 	{ 0, 2, 3, 4, 5, 6, 7, 8, 9 }, 
+		// 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
+		// 	{ 7, 8, 9, 1, 2, 3, 0, 5, 0 },
+		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
+		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
+		// 	{ 8, 9, 7, 2, 1, 4, 0, 6, 5 },
+		// 	{ 5, 3, 1, 6, 4, 2, 9, 7, 8 },
+		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
+		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 0 } };
+
+
+		printBoard(board1);
+		
+		if (checkBoard(board1)) {
+			System.out.print("The board is valid");
+			if (unsolved) { System.out.println("....but not solved.");}
+			else if (!unsolved) { 
+				System.out.println(" and solved.");
+				return;
+			}
+		} 
+		else {
+			System.out.println("The board is not valid!");
+		}
+
+		if (solve(board1)) {
+			System.out.println("Solved! Solution:");
+			printBoard(board1);
+		} else {
+			System.out.println("Couldn't solve the board!");
+		}
+
+	}
+
+
+
+/* ------------------------------------------------------------------------------------------- Start Of Main Class Functions ------------------------------------------------------------------------------------------------ */
+
+	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (ErrorReport)------------------------------------------------------------------------------------------------ */
+		/* CALLERS
+			1. solve()
+			2. 	
+		   
+		   CALLS
+		    1. FindTile_Empty()
+			2. checkBoard()
+		*/
+	private static void setTile(int[][] board) {
+		boolean check		   = false;
+		ErrorID tile;
+
+		/* for (int row = 0; row < board.length; row++) {
+			for (int column = 0; column < board.length; column++) {
+				if ((board[row][column] == 0) || )
+			}
+		} */
+		/* 
+			Continues to execute as long as an empty tile can be found.
+		*/
+		for (tile = FindTile_Empty(board); tile != null; tile = FindTile_Empty(board)) {
+			// ErrorID temp = tile;
+			// tile.setType(false);
+			for (int i = 1; i < 10; i ++) {
+				board[tile.getY()][tile.getX()] = i;
+
+				/* DEBUG */
+				System.out.println();
+				System.out.println();
+				System.out.println("DEBUG");
+				printBoard(board);
+				System.out.println();
+				System.out.println();
+				/* DEBUG */
+
+				/* 
+					Check if the value placed at the empty index position is a valid placement.
+				*/
+				check = checkBoard(board);
+				if (!check) {			// If the board checker's response notifies that errors still remain,
+										// check if the value placed is one of those errors.
+					tile = FindTile_Error(board, tile);
+					if (tile == null) {	break; } // If nothing is returned, the tested value is a valid one. So, stop testing other values.
+					else { 
+						continue; 	// Else proceed with further testing.
+					}			 
+				}
+				/* 
+					If no errors are found, the placed value is correct. Remove the index position from the error collections.
+				*/
+				else {							
+					/* DEBUG */
+					System.out.println("-----PASSED CHECK!-----");
+					/* DEBUG */
+
+					/* TODO
+						Make a function to simplify
+					 */
+
+					break;
+				}
+				
+
+			}
+		}
+	}
+
+
+
+	private static void boardRepair(int[][] board) {
+		boolean check		   = false;
+		ErrorID tile;
+
+		/* for (int row = 0; row < board.length; row++) {
+			for (int column = 0; column < board.length; column++) {
+				if ((board[row][column] == 0) || )
+			}
+		} */
+		/* 
+			Continues to execute as long as an empty tile can be found.
+		*/
+		for (tile = getTile_Error(board); tile != null; tile = FindTile_Empty(board)) {
+			// ErrorID temp = tile;
+			// tile.setType(false);
+			for (int i = 1; i < 10; i ++) {
+				board[tile.getY()][tile.getX()] = i;
+
+				/* DEBUG */
+				System.out.println();
+				System.out.println();
+				System.out.println("DEBUG");
+				printBoard(board);
+				System.out.println();
+				System.out.println();
+				/* DEBUG */
+
+				/* 
+					Check if the value placed at the empty index position is a valid placement.
+				*/
+				check = checkBoard(board);
+				if (!check) {			// If the board checker's response notifies that errors still remain,
+										// check if the value placed is one of those errors.
+					tile = FindTile_Error(board, tile);
+					if (tile == null) {	break; } // If nothing is returned, the tested value is a valid one. So, stop testing other values.
+					else { 
+						continue; 	// Else proceed with further testing.
+					}			 
+				}
+				/* 
+					If no errors are found, the placed value is correct. Remove the index position from the error collections.
+				*/
+				else {							
+					/* DEBUG */
+					System.out.println("-----PASSED CHECK!-----");
+					/* DEBUG */
+
+					/* TODO
+						Make a function to simplify
+					 */
+
+					break;
+				}
+				
+
+			}
+		}
+	}
+
+
+
 	/**
 	 * Checks to see if the current board is valid. A valid board is one where there
 	 * are no duplicate values in: -Any row -Any column -Any of the 3x3 subgrids
@@ -220,63 +479,94 @@ public class BasicSudoku {
 	 * @return True if the board is valid (i.e., does not contain any duplicates in
 	 *         any rows, columns, or sub 3x3 boxes
 	 */
+	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBoard)------------------------------------------------------------------------------------------------ */
+		/* CALLERS
+			1. solve()
+			2. setTile()	
+		*/
 	public static boolean checkBoard(int[][] board) {
-		for (int[] iter : board) { 
-			if (checkBoxes(board) == false) { return false; }
-			/* if (checkRow(board, row) == false) {
-				return false;
-			}
-			row++; */
-		}
-		// else if (checkBoxes(board) == false) { return false; }
-		return true;
-	}
-	/* -------------------------------------------------------------------------------------------IMPLEMENTATION(checkRow)------------------------------------------------------------------------------------------------*/
-	private static boolean checkRow(int[][] board, int row) {
-		ErrorID nuError = new ErrorID();
+		ErrorID nuError;
 
-		for (int indx_start = 0; indx_start < 9; indx_start++) {
-			// // Or Math.floor()
-			// long subLoc = (indx_start/3);
-			for (int inner_indx = 0; inner_indx < 9; inner_indx++) { 
-				if (indx_start == inner_indx) { continue; }
-				if (board[row][indx_start] == board[row][inner_indx]) 	{ 
-					nuError.makePair(row, indx_start);
-					errors.add(nuError);
-					return false; 
+
+		for (int row = 0; row < 9; row++) {
+			for (int column = 0; column < 9; column++) { 
+				nuError = new ErrorID(row, column, board);
+				/* 
+					Save an empty space to the error collection, but not count them as "invalidities."
+					
+				*/
+				if (board[row][column] == 0) { 
+					nuError.setType(true);
+					if (ERRORS.contains(nuError)) { continue; }
+					else { ERRORS.add(nuError); }
+				}
+				else if ((board[row][column] != 0) && (checkRow(board, column, row) == false) || (checkColumn(board, column, row) == false)) {
+					nuError.setType(false);
+					if (ERRORS.contains(nuError)) { continue; }
+					else { ERRORS.add(nuError); }
+				}	
+				/* 
+					If an error is not found at the index space referenced by the Error,
+					Query the container of errors to find a similar error record. If a
+					record is found, and an error no longer exist in this index position,
+					remove the record from collection.
+
+					*Cannot edit a collection during traversal without utilizing an iterator object*
+
+				 */			
+				else {
+					int rem_column = column;
+					int rem_row	   = row;
+					ERRORS.removeIf(n -> (n.getX() == rem_column && n.getY() == rem_row)); 
 				}
 			}
-			if 	(checkColumn(board, board[row][indx_start], indx_start, row) == false) 	{
-				nuError.makePair(row, indx_start);
-				errors.add(nuError);
-				return false; 
-			}
-			// else if (checkBox(board, board[row][indx_start], indx_start, row) == false) {
-			// 	nuError.makePair(row, indx_start);
-			// 	errors.add(nuError);
-			// 	return false; 
-			// }
+		}
+
+		return checkNoErrors(board);
+	}
+	
+
+
+	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBoxes)------------------------------------------------------------------------------------------------ */
+	/* 
+	private static boolean checkBoxes(int[][] board) {
+
+
+		return true;
+	}
+	 */
+
+
+
+	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkRow)------------------------------------------------------------------------------------------------*/
+	private static boolean checkRow(int[][] board, int column,  int row) {
+		for (int inner_indx = 0; inner_indx < 9; inner_indx++) { 
+			if (column == inner_indx) { continue; }
+			if (board[row][column] == board[row][inner_indx]) 	{ return false;	}
 		}
 			
 		return true;
 	}
-	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkColumn)------------------------------------------------------------------------------------------------ */
-	private static boolean checkColumn(int[][] board, int value, int column, int row) {
-		ErrorID 	nuError 	= new ErrorID();
 
+
+
+	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkColumn)------------------------------------------------------------------------------------------------ */
+	private static boolean checkColumn(int[][] board, int column, int row) {
 		for (int indx_start = 0; indx_start < 9; indx_start++) {
-			if (indx_start == row) { continue; }
-			if (value == board[indx_start][column]) {
-				nuError.makePair(row, indx_start);
-				errors.add(nuError);
-				return false; 
-			}
+			if (row == indx_start) { continue; }
+			if (board[row][column] == board[indx_start][column]) { return false; }
 		}
 
 		return true;
 	}
+
+
+
 	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBox)------------------------------------------------------------------------------------------------ */
-	private static boolean checkBoxes(int[][] board/* , int value, int column, int row */) {
+		/* CALLERS
+			1. checkBoxes()
+		*/
+	private static boolean checkBox(int[][] board/* , int value, int column, int row */) {
 		ErrorID 		nuError 	= new ErrorID();
 		Set<Integer> 	tileCheck   = new HashSet<>();
 		int 			starter1 	= 0;
@@ -290,10 +580,11 @@ public class BasicSudoku {
 			}
 			for (int rIter = starter1; rIter < starter1 + 3; rIter++) {
 				for (int cIter = starter2; cIter != starter2 + 3; cIter++) {
+					if (board[rIter][cIter] == 0) { continue; }
 					if (tileCheck.add(board[rIter][cIter]) == false) {
-						long subLoc = (cIter/3);
-						nuError.makeTuple(rIter, cIter, subLoc);
-						errors.add(nuError);
+									// Or Math.floor()
+						// nuError.makeTuple(rIter, cIter, subLoc, board);
+						ERRORS.add(nuError);
 						return false; 
 					}
 				}
@@ -304,6 +595,21 @@ public class BasicSudoku {
 
 		return true;
 	}
+
+
+
+	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBox)------------------------------------------------------------------------------------------------ */
+	/* CALLERS
+			1. setTile()
+			2. 	
+	*/
+	private static boolean checkTilePlacement(int[][] board, int column, int row) {
+
+
+		return true;
+	}
+
+
 
 		/**
 		 * Attempts to recursively solve a sudoku board using a backtracking approach.
@@ -372,14 +678,24 @@ public class BasicSudoku {
 		 * @return true if the method successfully solves the board, false otherwise
 		 */
 		public static boolean solve(int[][] board) {
-			boolean chcBoard = checkBoard(board);
-			
-
-			// if (!chcBoard) { 
-				
-			// }
+			boolean checkSuccess = checkFull(board);
+			while (!checkSuccess) {
+				setTile(board);
+				checkSuccess = checkFull(board);
+			}
+			checkSuccess = checkBoard(board);
+			while (!checkSuccess) {
+				boardRepair(board);
+				checkSuccess = checkBoard(board);
+			}
+			if (checkSuccess) {
+				return true;
+			}
 
 			return false;
 		}
+
+
+
 
 }
