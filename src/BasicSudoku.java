@@ -397,13 +397,8 @@ public class BasicSudoku {
 		boolean check		   = false;
 		ErrorID tile;
 
-		/* for (int row = 0; row < board.length; row++) {
-			for (int column = 0; column < board.length; column++) {
-				if ((board[row][column] == 0) || )
-			}
-		} */
 		/* 
-			Continues to execute as long as an empty tile can be found.
+			Continues to execute as long as an invalid tile can be found.
 		*/
 		for (tile = getTile_Error(board); tile != null; tile = FindTile_Empty(board)) {
 			// ErrorID temp = tile;
@@ -421,7 +416,7 @@ public class BasicSudoku {
 				/* DEBUG */
 
 				/* 
-					Check if the value placed at the empty index position is a valid placement.
+					Check if the value placed at the invalid index position is a valid placement.
 				*/
 				check = checkBoard(board);
 				if (!check) {			// If the board checker's response notifies that errors still remain,
@@ -429,7 +424,7 @@ public class BasicSudoku {
 					tile = FindTile_Error(board, tile);
 					if (tile == null) {	break; } // If nothing is returned, the tested value is a valid one. So, stop testing other values.
 					else { 
-						continue; 	// Else proceed with further testing.
+						continue; 				// Else proceed with further testing.
 					}			 
 				}
 				/* 
