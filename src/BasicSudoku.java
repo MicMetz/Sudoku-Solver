@@ -390,7 +390,7 @@ public class BasicSudoku {
 			}
 		}
 	}
-
+ 
 
 
 	private static void boardRepair(int[][] board) {
