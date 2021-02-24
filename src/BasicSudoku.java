@@ -41,14 +41,19 @@ public class BasicSudoku {
 		private boolean emptyUnit	= false;
 		private int 	column 		= 0;
 		private int 	row 		= 0;
-		
+		private int		box			= -1;
 
 		ErrorID() {}
-
 		ErrorID(int row, int column, int[][] board) {
 			this.column = column;
 			this.row 	= row;
 			BoardID 	= board;
+		}
+		ErrorID(int row, int column, int[][] board, int bunit) {
+			this.column = column;
+			this.row 	= row;
+			BoardID 	= board;
+			box			= bunit;
 		}
 		ErrorID(int row, int column, int[][] board, boolean unit) {
 			this.column = column;
@@ -63,19 +68,6 @@ public class BasicSudoku {
 			this.row 	= row;
 			BoardID 	= board;
 		}
-		// public void makeTuple(int row, int column, long subBox, int[][] board) {
-		// 	this.column = column;
-		// 	this.row 	= row;
-		// 	this.subBox	= subBox;
-		// 	sqUnit = true;
-		// 	BoardID = board;
-		// }
-
-		//@Override 
-		/* public boolean equals(ErrorID obj2) {
-			if (this.row == obj2.getY() && this.column == obj2.getX() && this.BoardID == obj2.getID()) { return true; }
-			return false;
-		} */
 
 		//	GETTERS | SETTERS | CHECKERS
 		public int 		getX() 							{ return column; }
@@ -112,7 +104,7 @@ public class BasicSudoku {
 
 	/* -------------------------------------------------------------------------------------------HELPER (FindTile_Error)------------------------------------------------------------------------------------------------ */
 	private static BasicSudoku.ErrorID FindTile_Error(int[][] board, ErrorID ID) {
-		if (checkNoErrors(board) == true) { return null; }  
+		if (checkNoErrors(board)) { return null; }
 		else {
 			for (ErrorID err : ERRORS) {
 				if (ID.equals(err)) {
@@ -127,7 +119,7 @@ public class BasicSudoku {
 
 
 	private static BasicSudoku.ErrorID getTile_Error(int[][] board) {
-		if (checkNoErrors(board) == true) { return null; }  
+		if (checkNoErrors(board)) { return null; }
 		else {
 			for (ErrorID err : ERRORS) {
 				return err;
@@ -151,7 +143,6 @@ public class BasicSudoku {
 			if (iter.getID() == board) {
 				if (iter.isEmptyUnit()) { 
 					unsolved = true;
-					continue; 
 				}
 				else {
 					emptyOfErr = false;
@@ -244,56 +235,56 @@ public class BasicSudoku {
 		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
 
 		// board1 to solve 
-		// int[][] board1 = { 
-		// 	{ 0, 2, 3, 4, 5, 6, 7, 8, 0 }, 
-		// 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
-		// 	{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
-		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
-		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
-		// 	{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
-		// 	{ 5, 3, 1, 6, 4, 2, 9, 7, 8 }, 
-		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
-		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
+//		 int[][] board1 = {
+//		 	{ 0, 2, 3, 4, 5, 6, 7, 8, 0 },
+//		 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 },
+//		 	{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
+//		 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 },
+//		 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 },
+//		 	{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
+//		 	{ 5, 3, 1, 6, 4, 2, 9, 7, 8 },
+//		 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 },
+//		 	{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
 
 
 
-		// board1 is not valid (notice the duplicate 9's in the first row)
-		int[][] board1 = { 
-			{ 9, 2, 3, 4, 5, 6, 7, 8, 9 }, 
-			{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
+		// board1 is not valid (Multiple 9s in some rows, columns, and boxes)
+		int[][] board1 = {
+			{ 9, 2, 3, 4, 5, 6, 7, 8, 9 },
+			{ 4, 5, 6, 7, 8, 9, 1, 2, 3 },
 			{ 7, 8, 9, 1, 2, 3, 0, 5, 0 },
-			{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
-			{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
-			{ 8, 9, 7, 2, 1, 4, 0, 6, 5 },
-			{ 5, 3, 1, 6, 4, 2, 9, 7, 8 }, 
-			{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
+			{ 2, 9, 4, 3, 6, 5, 8, 9, 7 },
+			{ 9, 6, 5, 8, 9, 7, 2, 1, 4 },
+			{ 9, 9, 7, 2, 1, 4, 0, 6, 5 },
+			{ 5, 3, 1, 6, 4, 2, 9, 7, 8 },
+			{ 6, 4, 2, 9, 7, 8, 5, 3, 1 },
 			{ 9, 7, 8, 5, 3, 1, 6, 4, 0 } };
 
 
-		// board1 error (box 2)
-		// int[][] board1 = { 
-		// 	{ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 
-		// 	{ 0, 5, 6, 7, 4, 9, 1, 2, 3 }, 
-		// 	{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
-		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
-		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
-		// 	{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
-		// 	{ 5, 3, 1, 6, 0, 2, 9, 7, 8 }, 
-		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
-		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
+		 //board1 error (box 2)
+//		 int[][] board1 = {
+//		 	{ 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+//		 	{ 0, 5, 6, 7, 4, 9, 1, 2, 3 },
+//		 	{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
+//		 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 },
+//		 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 },
+//		 	{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
+//		 	{ 5, 3, 1, 6, 0, 2, 9, 7, 8 },
+//		 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 },
+//		 	{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
 
 
-		// board2 is valid and corresponds to the board in the easy.txt file. This one should take your computer less than a second to solve.
-		// int[][] board2 = { 
-		// 	{ 0, 2, 3, 4, 5, 6, 7, 8, 9 }, 
-		// 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
-		// 	{ 7, 8, 9, 1, 2, 3, 0, 5, 0 },
-		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
-		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
-		// 	{ 8, 9, 7, 2, 1, 4, 0, 6, 5 },
-		// 	{ 5, 3, 1, 6, 4, 2, 9, 7, 8 },
-		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
-		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 0 } };
+		 //board2 is valid and corresponds to the board in the easy.txt file. This one should take your computer less than a second to solve.
+//		 int[][] board1 = {
+//		 	{ 0, 2, 3, 4, 5, 6, 7, 8, 9 },
+//		 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 },
+//		 	{ 7, 8, 9, 1, 2, 3, 0, 5, 0 },
+//		 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 },
+//		 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 },
+//		 	{ 8, 9, 7, 2, 1, 4, 0, 6, 5 },
+//		 	{ 5, 3, 1, 6, 4, 2, 9, 7, 8 },
+//		 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 },
+//		 	{ 9, 7, 8, 5, 3, 1, 6, 4, 0 } };
 
 
 		printBoard(board1);
@@ -323,11 +314,11 @@ public class BasicSudoku {
 
 /* ------------------------------------------------------------------------------------------- Start Of Main Class Functions ------------------------------------------------------------------------------------------------ */
 
-	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (ErrorReport)------------------------------------------------------------------------------------------------ */
+	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (setTile)------------------------------------------------------------------------------------------------ */
 		/* CALLERS
 			1. solve()
-			2. 	
-		   
+			2.
+
 		   CALLS
 		    1. FindTile_Empty()
 			2. checkBoard()
@@ -336,17 +327,10 @@ public class BasicSudoku {
 		boolean check		   = false;
 		ErrorID tile;
 
-		/* for (int row = 0; row < board.length; row++) {
-			for (int column = 0; column < board.length; column++) {
-				if ((board[row][column] == 0) || )
-			}
-		} */
 		/* 
 			Continues to execute as long as an empty tile can be found.
 		*/
 		for (tile = FindTile_Empty(board); tile != null; tile = FindTile_Empty(board)) {
-			// ErrorID temp = tile;
-			// tile.setType(false);
 			for (int i = 1; i < 10; i ++) {
 				board[tile.getY()][tile.getX()] = i;
 
@@ -367,9 +351,7 @@ public class BasicSudoku {
 										// check if the value placed is one of those errors.
 					tile = FindTile_Error(board, tile);
 					if (tile == null) {	break; } // If nothing is returned, the tested value is a valid one. So, stop testing other values.
-					else { 
-						continue; 	// Else proceed with further testing.
-					}			 
+					// Else proceed with further testing.
 				}
 				/* 
 					If no errors are found, the placed value is correct. Remove the index position from the error collections.
@@ -378,11 +360,6 @@ public class BasicSudoku {
 					/* DEBUG */
 					System.out.println("-----PASSED CHECK!-----");
 					/* DEBUG */
-
-					/* TODO
-						Make a function to simplify
-					 */
-
 					break;
 				}
 				
@@ -390,10 +367,19 @@ public class BasicSudoku {
 			}
 		}
 	}
- 
 
 
-	private static void boardRepair(int[][] board) {
+
+	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (boardRepair)------------------------------------------------------------------------------------------------ */
+		/* CALLERS
+			1. solve()
+			2.
+
+		   CALLS
+		    1. FindTile_Empty()
+			2. checkBoard()
+		*/
+	private static void tileRepair(int[][] board) {
 		boolean check		   = false;
 		ErrorID tile;
 
@@ -401,8 +387,6 @@ public class BasicSudoku {
 			Continues to execute as long as an invalid tile can be found.
 		*/
 		for (tile = getTile_Error(board); tile != null; tile = FindTile_Empty(board)) {
-			// ErrorID temp = tile;
-			// tile.setType(false);
 			for (int i = 1; i < 10; i ++) {
 				board[tile.getY()][tile.getX()] = i;
 
@@ -423,9 +407,7 @@ public class BasicSudoku {
 										// check if the value placed is one of those errors.
 					tile = FindTile_Error(board, tile);
 					if (tile == null) {	break; } // If nothing is returned, the tested value is a valid one. So, stop testing other values.
-					else { 
-						continue; 				// Else proceed with further testing.
-					}			 
+					// Else proceed with further testing.
 				}
 				/* 
 					If no errors are found, the placed value is correct. Remove the index position from the error collections.
@@ -434,11 +416,6 @@ public class BasicSudoku {
 					/* DEBUG */
 					System.out.println("-----PASSED CHECK!-----");
 					/* DEBUG */
-
-					/* TODO
-						Make a function to simplify
-					 */
-
 					break;
 				}
 				
@@ -484,23 +461,22 @@ public class BasicSudoku {
 
 
 		for (int row = 0; row < 9; row++) {
-			for (int column = 0; column < 9; column++) { 
+			for (int column = 0; column < 9; column++) {
 				nuError = new ErrorID(row, column, board);
-				/* 
+				/*
 					Save an empty space to the error collection, but not count them as "invalidities."
-					
 				*/
-				if (board[row][column] == 0) { 
+				if (board[row][column] == 0) {
 					nuError.setType(true);
-					if (ERRORS.contains(nuError)) { continue; }
-					else { ERRORS.add(nuError); }
+					ErrorID check = FindTile_Error(board, nuError);
+					if (check == null) { ERRORS.add(nuError); }
 				}
-				else if ((board[row][column] != 0) && (checkRow(board, column, row) == false) || (checkColumn(board, column, row) == false)) {
+				else if ((board[row][column] != 0) && (!checkRow(board, column, row)) || (!checkColumn(board, column, row))) {
 					nuError.setType(false);
-					if (ERRORS.contains(nuError)) { continue; }
-					else { ERRORS.add(nuError); }
-				}	
-				/* 
+					ErrorID check = FindTile_Error(board, nuError);
+					if (check == null) { ERRORS.add(nuError); }
+				}
+				/*
 					If an error is not found at the index space referenced by the Error,
 					Query the container of errors to find a similar error record. If a
 					record is found, and an error no longer exist in this index position,
@@ -508,7 +484,7 @@ public class BasicSudoku {
 
 					*Cannot edit a collection during traversal without utilizing an iterator object*
 
-				 */			
+				 */
 				else {
 					int rem_column = column;
 					int rem_row	   = row;
@@ -517,25 +493,15 @@ public class BasicSudoku {
 			}
 		}
 
-		return checkNoErrors(board);
+
+		return checkBoxes(board);
 	}
-	
-
-
-	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBoxes)------------------------------------------------------------------------------------------------ */
-	/* 
-	private static boolean checkBoxes(int[][] board) {
-
-
-		return true;
-	}
-	 */
 
 
 
 	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkRow)------------------------------------------------------------------------------------------------*/
 	private static boolean checkRow(int[][] board, int column,  int row) {
-		for (int inner_indx = 0; inner_indx < 9; inner_indx++) { 
+		for (int inner_indx = 0; inner_indx < board.length; inner_indx++) {
 			if (column == inner_indx) { continue; }
 			if (board[row][column] == board[row][inner_indx]) 	{ return false;	}
 		}
@@ -547,7 +513,7 @@ public class BasicSudoku {
 
 	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkColumn)------------------------------------------------------------------------------------------------ */
 	private static boolean checkColumn(int[][] board, int column, int row) {
-		for (int indx_start = 0; indx_start < 9; indx_start++) {
+		for (int indx_start = 0; indx_start < board.length; indx_start++) {
 			if (row == indx_start) { continue; }
 			if (board[row][column] == board[indx_start][column]) { return false; }
 		}
@@ -557,52 +523,94 @@ public class BasicSudoku {
 
 
 
-	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBox)------------------------------------------------------------------------------------------------ */
+	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBoxes)------------------------------------------------------------------------------------------------ */
 		/* CALLERS
-			1. checkBoxes()
+			1. checkBoard()
 		*/
-	private static boolean checkBox(int[][] board/* , int value, int column, int row */) {
-		ErrorID 		nuError 	= new ErrorID();
-		Set<Integer> 	tileCheck   = new HashSet<>();
-		int 			starter1 	= 0;
-		int				starter2	= 0;
-		
+	private static boolean checkBoxes(int[][] board) {
+		int[][]				box			= new int[3][3];
+		ArrayList<int[][]>	boxes		= new ArrayList<>();
+		ErrorID 			nuError 	= new ErrorID();
 
+
+		int starter1 = 0;
+		int	starter2 = 0;
 		for (int bIter = 0; bIter < 9; bIter++) {
-			if (starter2 == 9) { 
-				starter1 += 3; 
+			if (starter2 == 9) {
+				starter1 += 3;
 				starter2 = 0;
 			}
+			int y = 0;
 			for (int rIter = starter1; rIter < starter1 + 3; rIter++) {
-				for (int cIter = starter2; cIter != starter2 + 3; cIter++) {
-					if (board[rIter][cIter] == 0) { continue; }
-					if (tileCheck.add(board[rIter][cIter]) == false) {
-									// Or Math.floor()
-						// nuError.makeTuple(rIter, cIter, subLoc, board);
-						ERRORS.add(nuError);
-						return false; 
+				int x = 0;
+				for (int cIter = starter2; cIter < starter2 + 3; cIter++) {
+					box[y][x] = board[rIter][cIter];
+					x++;
+				}
+				y++;
+			}
+			boxes.add(box);
+			starter2 += 3;
+		}
+
+		int bIndex = 0;
+		for (int[][] boxesIter : boxes) {
+			for (int rowIter = 0; rowIter < 3; rowIter++) {
+				for (int columnIter = 0; columnIter < 3; columnIter++) {
+					boolean check = checkBox(boxesIter, boxesIter[rowIter][columnIter], rowIter, columnIter);
+					if (!check) {
+						nuError = new ErrorID(rowIter, columnIter, board, bIndex);
+						ErrorID checkError = FindTile_Error(board, nuError);
+						if (checkError == null) { ERRORS.add(nuError); }
 					}
 				}
 			}
-			tileCheck.clear();
-			starter2 += 3;
+			bIndex++;
 		}
+
+
+		return checkNoErrors(board);
+	}
+
+
+
+	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBox)------------------------------------------------------------------------------------------------ *//*
+		/* CALLERS
+			1. checkBoxes()
+		*/
+	private static boolean checkBox(int[][] box, int val, int row, int column) {
+//		Set<Integer> tileCheck = new HashSet<>();
+
+		if (val == 0) { return true; }
+		for (int row_start = 0; row_start < 3; row_start++) {
+			for (int column_start = 0; column_start < 3; column_start++) {
+				if (box[row_start][column_start] == 0 || (row_start == row && column_start == column)) { continue; }
+				/*tileCheck.add(box[row_start][column_start]);
+				if (!tileCheck.contains(box[row_start][column_start])) {
+					return false;
+				}*/
+				if ((box[row_start][column_start]) == val) {
+					return false;
+				}
+			}
+		}
+//		tileCheck.clear();
+
 
 		return true;
 	}
 
 
+
+	private static void repairBox(ArrayList<int[][]> boxes, int row, int column) {
+
+	}
 
 	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBox)------------------------------------------------------------------------------------------------ */
 	/* CALLERS
 			1. setTile()
 			2. 	
 	*/
-	private static boolean checkTilePlacement(int[][] board, int column, int row) {
-
-
-		return true;
-	}
 
 
 
@@ -680,11 +688,9 @@ public class BasicSudoku {
 			}
 			checkSuccess = checkBoard(board);
 			while (!checkSuccess) {
-				boardRepair(board);
+				tileRepair(board);
 				checkSuccess = checkBoard(board);
-			}
-			if (checkSuccess) {
-				return true;
+				if (checkSuccess) { return true; }
 			}
 
 			return false;
