@@ -333,11 +333,6 @@ public class BasicSudoku {
 	}
 
 
-		/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBox)------------------------------------------------------------------------------------------------ */
-	/* CALLERS
-			1. setTile()
-			2.
-	*/
 
 		/*
 		 * Attempts to recursively solve a sudoku board using a backtracking approach.
