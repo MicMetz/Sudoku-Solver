@@ -88,18 +88,18 @@ public class BasicSudoku {
 
 
 		// board1 valid
-		// int[][] board1 = { 
-		// 	{ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 
-		// 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 }, 
+		// int[][] board1 = {
+		// 	{ 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+		// 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 },
 		// 	{ 7, 8, 9, 1, 2, 3, 4, 5, 6 },
-		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 }, 
-		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 }, 
+		// 	{ 2, 1, 4, 3, 6, 5, 8, 9, 7 },
+		// 	{ 3, 6, 5, 8, 9, 7, 2, 1, 4 },
 		// 	{ 8, 9, 7, 2, 1, 4, 3, 6, 5 },
-		// 	{ 5, 3, 1, 6, 4, 2, 9, 7, 8 }, 
-		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 }, 
+		// 	{ 5, 3, 1, 6, 4, 2, 9, 7, 8 },
+		// 	{ 6, 4, 2, 9, 7, 8, 5, 3, 1 },
 		// 	{ 9, 7, 8, 5, 3, 1, 6, 4, 2 } };
 
-		// board1 to solve 
+		// board1 to solve
 //		 int[][] board1 = {
 //		 	{ 0, 2, 3, 4, 5, 6, 7, 8, 0 },
 //		 	{ 4, 5, 6, 7, 8, 9, 1, 2, 3 },
@@ -218,7 +218,7 @@ public class BasicSudoku {
 	/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBoard)------------------------------------------------------------------------------------------------ */
 		/* CALLERS
 			1. solve()
-			2. setTile()	
+			2. setTile()
 		*/
 	public static boolean checkBoard(int[][] board) {
 		boolean check = false;
@@ -336,7 +336,7 @@ public class BasicSudoku {
 		/* -------------------------------------------------------------------------------------------IMPLEMENTATION (checkBox)------------------------------------------------------------------------------------------------ */
 	/* CALLERS
 			1. setTile()
-			2. 	
+			2.
 	*/
 
 		/*
@@ -408,7 +408,6 @@ public class BasicSudoku {
 
 		/*TODO: Solve needs to be a recursive Function -- Redesign everything*/
 		public static boolean solve(int[][] board) {
-			boolean check;
 
 			for (int row = 0; row < 9; row++) {
 				for (int column = 0; column < 9; column++) {
