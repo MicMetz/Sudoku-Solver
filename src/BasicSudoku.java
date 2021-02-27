@@ -179,6 +179,7 @@ public class BasicSudoku {
 		if (solve(board1)) {
 			System.out.println("Solved! Solution:");
 			printBoard(board1);
+			GUISudoku.updateSudokuGUI(board1);
 		} else {
 			System.out.println("Couldn't solve the board!");
 		}
@@ -419,6 +420,10 @@ public class BasicSudoku {
 							System.out.println();
 							System.out.println();
 							/*DEBUG*/
+
+
+							GUISudoku.updateSudokuGUI(board);
+
 
 							/*Check if the value placed at the empty index position is a valid placement.*/
 							if (checkBoard(board, column, row)) {
