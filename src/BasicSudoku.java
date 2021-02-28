@@ -5,9 +5,8 @@
  ###                                                                       ###
  ### Files:         BasicSudoku.java|GUISudoku.java                        ###
  ### Author(s):     Michael Metz (mime9599@colorado.edu)                   ###
- ### Class:         ATLAS 2519                                             ###
  ### Written:       February 12, 2021                                      ###
- ### Description:                                                          ###
+ ### Description:   A program that solves a Sudoku puzzle.                 ###
  ### License:                                                              ###
  ### Credits:                                                              ###
  #############################################################################
